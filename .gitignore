@@ -1,2 +1,6 @@
 # Ignore output of scraper
 data.sqlite
+node_modules
+out
+._*
+

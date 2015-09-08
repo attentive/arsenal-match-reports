@@ -1,59 +1,10 @@
-// This is a template for a Node.js scraper on morph.io (https://morph.io)
-
-var cheerio = require("cheerio");
-var request = require("request");
-var sqlite3 = require("sqlite3").verbose();
-
-function initDatabase(callback) {
-	// Set up sqlite database.
-	var db = new sqlite3.Database("data.sqlite");
-	db.serialize(function() {
-		db.run("CREATE TABLE IF NOT EXISTS data (name TEXT)");
-		callback(db);
-	});
+var path = require("path");
+try {
+    require("source-map-support").install();
+} catch(err) {
 }
-
-function updateRow(db, value) {
-	// Insert some data.
-	var statement = db.prepare("INSERT INTO data VALUES (?)");
-	statement.run(value);
-	statement.finalize();
-}
-
-function readRows(db) {
-	// Read some data.
-	db.each("SELECT rowid AS id, name FROM data", function(err, row) {
-		console.log(row.id + ": " + row.name);
-	});
-}
-
-function fetchPage(url, callback) {
-	// Use request to read in pages.
-	request(url, function (error, response, body) {
-		if (error) {
-			console.log("Error requesting page: " + error);
-			return;
-		}
-
-		callback(body);
-	});
-}
-
-function run(db) {
-	// Use request to read in pages.
-	fetchPage("https://morph.io", function (body) {
-		// Use cheerio to find things in the page with css selectors.
-		var $ = cheerio.load(body);
-
-		var elements = $("div.media-body span.p-name").each(function () {
-			var value = $(this).text().trim();
-			updateRow(db, value);
-		});
-
-		readRows(db);
-
-		db.close();
-	});
-}
-
-initDatabase(run);
+require(path.join(path.resolve("."),"out","goog","bootstrap","nodejs.js"));
+require(path.join(path.resolve("."),"out","cljs_deps.js"));
+goog.global.CLOSURE_UNCOMPILED_DEFINES = {"cljs.core._STAR_target_STAR_":"nodejs"};
+goog.require("arsenal_match_reports.core");
+goog.require("cljs.nodejscli");
